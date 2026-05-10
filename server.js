@@ -119,8 +119,10 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     user.resetCode = code;
     user.resetExpires = Date.now() + 15 * 60 * 1000;
     saveDB(db);
-    await sendResetEmail(user.email, user.name, code);
+    // Send email async - don't wait for it to respond
     res.json({ success: true, message: 'Reset code sent to your email!' });
+    // Send email after responding
+    sendResetEmail(user.email, user.name, code).catch(e => console.error('Email error:', e));
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
